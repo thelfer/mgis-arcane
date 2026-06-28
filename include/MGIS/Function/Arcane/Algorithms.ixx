@@ -51,16 +51,19 @@ namespace mgis::function {
     }
     //
     auto command = Arcane::Accelerator::makeCommand(q);
-    auto bounds = Arcane::SimpleForLoopRanges<1, space_size_type>{getSpaceSize(f)};
+    const auto bounds = Arcane::SimpleForLoopRanges<1, Arcane::Int32>{
+        static_cast<Arcane::Int32>(getSpaceSize(space))};
     //
     if constexpr (LightweightViewConcept<FunctionType>) {
       if constexpr (use_direct_assignement) {
-        auto fct = [f, e](const space_size_type i) mutable {
+        auto fct = [&f, e](const Arcane::MDIndex<1> idx) mutable  {
+          const auto i = static_cast<Arcane::Int32>(idx);
           f(i) = e(i);
         };
         Arcane::Accelerator::run(command, bounds, fct);
       } else {
-        auto fct = [f, e](const space_size_type i) mutable {
+        auto fct = [&f, e](const Arcane::MDIndex<1> idx) mutable  {
+          const auto i = static_cast<Arcane::Int32>(idx);
           ::mgis::function::internals::assign_value(f(i), e(i));
         };
         Arcane::Accelerator::run(command, bounds, fct);
@@ -68,12 +71,14 @@ namespace mgis::function {
     } else {
       auto v = view(f);
       if constexpr (use_direct_assignement) {
-        auto fct = [v, e](const space_size_type i) mutable {
+        auto fct = [v, e](const Arcane::MDIndex<1> idx) mutable  {
+          const auto i = static_cast<Arcane::Int32>(idx);
           v(i) = e(i);
         };
         Arcane::Accelerator::run(command, bounds, fct);
       } else {
-        auto fct = [v, e](const space_size_type i) mutable {
+        auto fct = [v, e](const Arcane::MDIndex<1> idx) mutable  {
+          const auto i = static_cast<Arcane::Int32>(idx);
           ::mgis::function::internals::assign_value(v(i), e(i));
         };
         Arcane::Accelerator::run(command, bounds, fct);

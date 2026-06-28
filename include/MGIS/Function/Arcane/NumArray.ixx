@@ -31,14 +31,16 @@ namespace mgis::function::internals {
     auto space = BasicLinearSpace(a.extent0());
     auto data = std::span<mgis::real>(a.to1DSpan().data(), e0 * e1);
     if constexpr (N == mgis::dynamic_extent) {
-      return FunctionView<BasicLinearSpace, {}, true>{space, data, e1};
+      return FunctionView<BasicLinearSpace, FunctionDataLayoutDescription{}, true>{
+          space, data, e1};
     } else {
       if (e1 != N) {
         ContractViolationHandler ctx;
         ctx.registerErrorMessage(
             "right_layout_view_impl: invalid number of components");
       }
-      return FunctionView<BasicLinearSpace, {.data_size = N, .data_stride = N},
+      return FunctionView<BasicLinearSpace,
+                          FunctionDataLayoutDescription{.data_size = N, .data_stride = N},
                           true>{space, data};
     }
   }  // end of view
@@ -53,14 +55,16 @@ namespace mgis::function::internals {
     auto space = BasicLinearSpace(e0);
     auto data = std::span<const mgis::real>(a.to1DSpan().data(), e0 * e1);
     if constexpr (N == mgis::dynamic_extent) {
-      return FunctionView<BasicLinearSpace, {}, false>{space, data, e1};
+      return FunctionView<BasicLinearSpace, FunctionDataLayoutDescription{}, false>{
+          space, data, e1};
     } else {
       if (e1 != N) {
         ContractViolationHandler ctx;
         ctx.registerErrorMessage(
             "right_layout_view_impl: invalid number of components");
       }
-      return FunctionView<BasicLinearSpace, {.data_size = N, .data_stride = N},
+      return FunctionView<BasicLinearSpace,
+                          FunctionDataLayoutDescription{.data_size = N, .data_stride = N},
                           false>{space, data};
     }
   }  // end of view
@@ -112,7 +116,8 @@ namespace mgis::function {
   auto view(
       Arcane::NumArray<mgis::real, Arcane::MDDim1, LayoutPolicy> &a) noexcept {
     auto space = BasicLinearSpace(a.extent0());
-    return FunctionView<BasicLinearSpace, {1, 1}, true>{
+    return FunctionView<BasicLinearSpace, FunctionDataLayoutDescription{1, 1},
+                        true>{
         space, std::span<mgis::real>(a._internalData(), a.extent0())};
   }  // end of view
 
@@ -120,7 +125,8 @@ namespace mgis::function {
   auto const_view(
       Arcane::NumArray<mgis::real, Arcane::MDDim1, LayoutPolicy> &a) noexcept {
     auto space = BasicLinearSpace(a.extent0());
-    return FunctionView<BasicLinearSpace, {1, 1}, false>{
+    return FunctionView<BasicLinearSpace, FunctionDataLayoutDescription{1, 1},
+                        false>{
         space, std::span<mgis::real>(a._internalData(), a.extent0())};
   }  // end of view
 
@@ -128,17 +134,18 @@ namespace mgis::function {
   auto view(const Arcane::NumArray<mgis::real, Arcane::MDDim1, LayoutPolicy>
                 &a) noexcept {
     auto space = BasicLinearSpace(a.extent0());
-    return FunctionView<BasicLinearSpace, {1, 1}, false>{
+    return FunctionView<BasicLinearSpace, FunctionDataLayoutDescription{1, 1},
+                        false>{
         space, std::span<mgis::real>(a._internalData(), a.extent0())};
   }  // end of view
 
-  template <mgis::size_type N = mgis::dynamic_extent>
+  template <mgis::size_type N>
   auto view(Arcane::NumArray<mgis::real, Arcane::MDDim2, Arcane::RightLayout>
                 &a) noexcept {
     return internals::right_layout_view_impl<N>(a);
   }  // end of view
 
-  template <mgis::size_type N = mgis::dynamic_extent>
+  template <mgis::size_type N>
   auto const_view(
       Arcane::NumArray<mgis::real, Arcane::MDDim2, Arcane::RightLayout>
           &a) noexcept {
@@ -147,14 +154,14 @@ namespace mgis::function {
                                            Arcane::RightLayout> &>(a));
   }  // end of view
 
-  template <mgis::size_type N = mgis::dynamic_extent>
+  template <mgis::size_type N>
   auto view(
       const Arcane::NumArray<mgis::real, Arcane::MDDim2, Arcane::RightLayout>
           &a) noexcept {
     return internals::right_layout_view_impl<N>(a);
   }  // end of view
 
-  template <mgis::size_type N = mgis::dynamic_extent>
+  template <mgis::size_type N>
   auto view(Arcane::NumArray<mgis::real, Arcane::MDDim2, Arcane::LeftLayout>
                 &a) noexcept {
     return internals::left_layout_view_impl<N>(a);
@@ -176,7 +183,7 @@ namespace mgis::function {
     return internals::left_layout_view_impl<N>(a);
   }  // end of view
 
-  template <mgis::size_type N = mgis::dynamic_extent>
+  template <mgis::size_type N>
   auto view(Arcane::NumArray<mgis::real, Arcane::MDDim2, Arcane::DefaultLayout>
                 &a) noexcept {
     static_assert(
@@ -184,7 +191,7 @@ namespace mgis::function {
     return internals::right_layout_view_impl<N>(a);
   }  // end of view
 
-  template <mgis::size_type N = mgis::dynamic_extent>
+  template <mgis::size_type N>
   auto const_view(
       Arcane::NumArray<mgis::real, Arcane::MDDim2, Arcane::DefaultLayout>
           &a) noexcept {
@@ -195,7 +202,7 @@ namespace mgis::function {
                                            Arcane::DefaultLayout> &>(a));
   }  // end of view
 
-  template <mgis::size_type N = mgis::dynamic_extent>
+  template <mgis::size_type N>
   auto view(
       const Arcane::NumArray<mgis::real, Arcane::MDDim2, Arcane::DefaultLayout>
           &a) noexcept {

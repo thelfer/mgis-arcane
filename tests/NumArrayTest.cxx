@@ -3,6 +3,10 @@
 #include <iostream>
 
 #include "arccore/common/ExceptionUtils.h"
+#include "arccore/common/accelerator/Memory.h"
+#include "arccore/common/accelerator/RunQueue.h"
+#include "arccore/common/accelerator/Runner.h"
+#include "arccore/accelerator/AcceleratorInitializer.h"
 #include "MGIS/Function/Arcane/NumArray.hxx"
 #include "MGIS/Function/Arcane/Algorithms.hxx"
 
@@ -109,4 +113,27 @@ void f5() {
   }
 }
 
-int main() { return Arcane::ExceptionUtils::callWithTryCatch(f4); }
+void f6() {
+  using namespace mgis;
+  using namespace mgis::function;
+  auto ctx = Context{};
+  auto initializer = Arcane::Accelerator::AcceleratorInitializer{false, 64};
+  auto runner = Arcane::Runner{initializer.executionPolicy()};
+  auto queue = Arcane::Accelerator::makeQueue(runner);
+  auto a = Arcane::NumArray<real, Arcane::MDDim1>(
+      12, Arcane::eMemoryResource::UnifiedMemory);
+  auto b = Arcane::NumArray<real, Arcane::MDDim1>(
+      12, Arcane::eMemoryResource::UnifiedMemory);
+  for (mgis::size_type i = 0; i != 12; ++i) {
+    b(i) = i;
+  }
+  const auto op = view(b) | multiply_by_scalar(3);
+  auto av = view(a);
+  const auto ok = assign(ctx, queue, av, op);
+  for (Arcane::Int32 i = 0; i != 12; ++i) {
+    std::cout << a(i) << ' ';
+  }
+  std::cout << '\n';
+}
+
+int main() { return Arcane::ExceptionUtils::callWithTryCatch(f6); }
