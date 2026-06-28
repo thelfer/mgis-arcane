@@ -4,6 +4,7 @@
 
 #include "arccore/common/ExceptionUtils.h"
 #include "MGIS/Function/Arcane/NumArray.hxx"
+#include "MGIS/Function/Arcane/Algorithms.hxx"
 
 void f() {
   auto a = Arcane::NumArray<double, Arcane::MDDim2>(12, 6);
