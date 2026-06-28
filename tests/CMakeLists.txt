@@ -1,0 +1,2 @@
+add_executable(NumArrayTest NumArrayTest.cxx)
+target_link_libraries(NumArrayTest MGISArcane)
