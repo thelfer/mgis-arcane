@@ -1,6 +1,6 @@
 /*!
  * \file   MGIS/Function/Arcane/Algorithms.hxx
- * \brief    
+ * \brief
  * \author Thomas Helfer
  * \date   28/06/2026
  * \copyright (C) Copyright Thomas Helfer 2018.
@@ -43,7 +43,7 @@ namespace mgis::function {
           std::same_as<function_space<FunctionType>,
                        evaluator_space<EvaluatorType>>);
 
-} // end of namespace mgis::function
+}  // end of namespace mgis::function
 
 #include "MGIS/Function/Arcane/Algorithms.ixx"
 

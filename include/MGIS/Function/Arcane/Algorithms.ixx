@@ -56,13 +56,15 @@ namespace mgis::function {
     //
     if constexpr (LightweightViewConcept<FunctionType>) {
       if constexpr (use_direct_assignement) {
-        auto fct = [&f, e](const Arcane::MDIndex<1> idx) mutable  {
+        auto fct = [f, e] ARCCORE_HOST_DEVICE(
+                       const Arcane::MDIndex<1> idx) mutable -> void {
           const auto i = static_cast<Arcane::Int32>(idx);
           f(i) = e(i);
         };
         Arcane::Accelerator::run(command, bounds, fct);
       } else {
-        auto fct = [&f, e](const Arcane::MDIndex<1> idx) mutable  {
+        auto fct = [f, e] ARCCORE_HOST_DEVICE(
+                       const Arcane::MDIndex<1> idx) mutable -> void {
           const auto i = static_cast<Arcane::Int32>(idx);
           ::mgis::function::internals::assign_value(f(i), e(i));
         };
@@ -71,13 +73,15 @@ namespace mgis::function {
     } else {
       auto v = view(f);
       if constexpr (use_direct_assignement) {
-        auto fct = [v, e](const Arcane::MDIndex<1> idx) mutable  {
+        auto fct = [v, e] ARCCORE_HOST_DEVICE(
+                       const Arcane::MDIndex<1> idx) mutable -> void {
           const auto i = static_cast<Arcane::Int32>(idx);
           v(i) = e(i);
         };
         Arcane::Accelerator::run(command, bounds, fct);
       } else {
-        auto fct = [v, e](const Arcane::MDIndex<1> idx) mutable  {
+        auto fct = [v, e] ARCCORE_HOST_DEVICE(
+                       const Arcane::MDIndex<1> idx) mutable -> void {
           const auto i = static_cast<Arcane::Int32>(idx);
           ::mgis::function::internals::assign_value(v(i), e(i));
         };

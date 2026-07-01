@@ -31,8 +31,8 @@ namespace mgis::function::internals {
     auto space = BasicLinearSpace(a.extent0());
     auto data = std::span<mgis::real>(a.to1DSpan().data(), e0 * e1);
     if constexpr (N == mgis::dynamic_extent) {
-      return FunctionView<BasicLinearSpace, FunctionDataLayoutDescription{}, true>{
-          space, data, e1};
+      return FunctionView<BasicLinearSpace, FunctionDataLayoutDescription{},
+                          true>{space, data, e1};
     } else {
       if (e1 != N) {
         ContractViolationHandler ctx;
@@ -40,7 +40,8 @@ namespace mgis::function::internals {
             "right_layout_view_impl: invalid number of components");
       }
       return FunctionView<BasicLinearSpace,
-                          FunctionDataLayoutDescription{.data_size = N, .data_stride = N},
+                          FunctionDataLayoutDescription{.data_size = N,
+                                                        .data_stride = N},
                           true>{space, data};
     }
   }  // end of view
@@ -55,8 +56,8 @@ namespace mgis::function::internals {
     auto space = BasicLinearSpace(e0);
     auto data = std::span<const mgis::real>(a.to1DSpan().data(), e0 * e1);
     if constexpr (N == mgis::dynamic_extent) {
-      return FunctionView<BasicLinearSpace, FunctionDataLayoutDescription{}, false>{
-          space, data, e1};
+      return FunctionView<BasicLinearSpace, FunctionDataLayoutDescription{},
+                          false>{space, data, e1};
     } else {
       if (e1 != N) {
         ContractViolationHandler ctx;
@@ -64,7 +65,8 @@ namespace mgis::function::internals {
             "right_layout_view_impl: invalid number of components");
       }
       return FunctionView<BasicLinearSpace,
-                          FunctionDataLayoutDescription{.data_size = N, .data_stride = N},
+                          FunctionDataLayoutDescription{.data_size = N,
+                                                        .data_stride = N},
                           false>{space, data};
     }
   }  // end of view
