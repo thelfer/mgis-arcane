@@ -1,4 +1,4 @@
 add_executable(NumArrayTest NumArrayTest.cxx)
 arccore_accelerator_add_source_files(NumArrayTest.cxx)
 arccore_accelerator_add_to_target(NumArrayTest)
-target_link_libraries(NumArrayTest PRIVATE MGISArcane)
+target_link_libraries(NumArrayTest PRIVATE mgis-arcane::MGISArcane)

@@ -1,0 +1,18 @@
+@PACKAGE_INIT@
+
+set(_ARCANE_MODULE_PATH "@Arcane_DIR@")
+if(ARCANE_DIR)
+  set(_ARCANE_MODULE_PATH "${Arcane_DIR}")
+endif()
+
+set(_MFrontGenericInterface_MODULE_PATH "@MFrontGenericInterface_DIR@")
+if(MFrontGenericInterface_DIR)
+  set(_MFrontGenericInterface_MODULE_PATH "${MFrontGenericInterface_DIR}")
+endif()
+
+find_package(Arcane REQUIRED
+  HINTS "${CMAKE_CURRENT_LIST_DIR}" "${_ARCANE_MODULE_PATH}")
+find_package(MFrontGenericInterface REQUIRED
+  HINTS "${CMAKE_CURRENT_LIST_DIR}" "${_MFrontGenericInterface_MODULE_PATH}")
+
+include("${CMAKE_CURRENT_LIST_DIR}/MGISArcaneTargets.cmake")

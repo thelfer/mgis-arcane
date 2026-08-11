@@ -18,13 +18,13 @@
 #include "arccore/accelerator/RunCommandLoop.h"
 #include "MGIS/Function/Algorithms.hxx"
 
-namespace mgis::function {
+namespace mgis::function::internals {
 
   template <typename FunctionType, EvaluatorConcept EvaluatorType>
-  bool assign(AbstractErrorHandler& ctx,
-              Arcane::RunQueue& q,
-              FunctionType& f,
-              const EvaluatorType e)  //
+  bool assign_impl(AbstractErrorHandler& ctx,
+		   Arcane::RunQueue& q,
+		   FunctionType& f,
+		   const EvaluatorType e)  //
       requires(
           ((LinearElementSpaceConcept<evaluator_space<EvaluatorType>>) ||
            (LinearQuadratureSpaceConcept<evaluator_space<EvaluatorType>>)) &&
@@ -89,8 +89,25 @@ namespace mgis::function {
       }
     }
     return true;
-  }  // end of assign
+  }  // end of assign_impl
 
+}  // end of namespace mgis::function::internals
+  
+namespace mgis::function{
+
+  template <typename FunctionType, EvaluatorConcept EvaluatorType>
+  bool assign(AbstractErrorHandler& ctx,
+              Arcane::RunQueue& q,
+              FunctionType& f,
+              const EvaluatorType e)  //
+      requires(
+          ((LinearElementSpaceConcept<evaluator_space<EvaluatorType>>) ||
+           (LinearQuadratureSpaceConcept<evaluator_space<EvaluatorType>>)) &&
+          std::same_as<function_space<FunctionType>,
+                       evaluator_space<EvaluatorType>>) {
+    return ::mgis::function::internals::assign_impl(ctx, q, f, e);
+  } // end of assign
+  
 }  // end of namespace mgis::function
 
 #endif /* LIB_MGIS_FUNCTION_ARCANE_ALGORITHMS_HXX */
