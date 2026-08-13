@@ -68,8 +68,8 @@ namespace mgis::arcane {
       const Arcane::Integer,
       const Arcane::Integer) noexcept;
 
-  [[nodiscard]] bool areEquivalent(const PartialQuadratureSpace&,
-                                   const PartialQuadratureSpace&) noexcept;
+  [[nodiscard]] bool areEquivalent(const PartialQuadratureSpace &,
+                                   const PartialQuadratureSpace &) noexcept;
 
 }  // namespace mgis::arcane
 

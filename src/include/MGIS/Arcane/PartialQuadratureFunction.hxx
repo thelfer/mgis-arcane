@@ -1,6 +1,6 @@
 /*!
  * \file   MGIS/Arcane/PartialQuadratureFunction.hxx
- * \brief    
+ * \brief
  * \author Thomas Helfer
  * \date   08/08/2026
  */
@@ -10,41 +10,21 @@
 
 #include <memory>
 #include "arcane/core/VariableTypes.h"
-
-namespace mgis::function::internals {
-
-  inline void assign_value(Arcane::ArrayView<real> lhs, const real& rhs) {
-    lhs[0] = rhs;
-  }
-
-  inline void assign_value(Arcane::ArrayView<real> lhs, const auto& rhs) {
-    std::copy(rhs.begin(), rhs.end(), lhs.begin());
-  }
-
-}  // end of namespace mgis::function::internals
-
 #include "MGIS/Function/Function.hxx"
+#include "MGIS/Function/FixedSizeModifier.hxx"
 #include "MGIS/Arcane/PartialQuadratureSpace.hxx"
-
-namespace mgis::function::internals{
-
-  template <>
-  struct FunctionResultTypeTraits<Arcane::ArrayView<real>> {
-    static constexpr auto is_specialized = true;
-  };
-
-  template <>
-  struct FunctionResultTypeTraits<Arcane::ConstArrayView<real>> {
-    static constexpr auto is_specialized = true;
-  };
-
-} // end of mgis::function::internals
 
 namespace Arcane {
 
   template <typename DataType>
   inline void assign_value(ArrayView<DataType> lhs,
                            const ArrayView<DataType>& rhs) {
+    std::copy(rhs.begin(), rhs.end(), lhs.begin());
+  }
+
+  template <typename DataType>
+  inline void assign_value(ArrayView<DataType> lhs,
+                           ConstArrayView<DataType>& rhs) {
     std::copy(rhs.begin(), rhs.end(), lhs.begin());
   }
 
@@ -84,10 +64,10 @@ namespace mgis::arcane {
                                         Arcane::Array2View<real>,
                                         Arcane::ConstArray2View<real>>;
     //
-    PartialQuadratureFunctionView(const PartialQuadratureSpace&,
-                                  DataType);
+    PartialQuadratureFunctionView(const PartialQuadratureSpace&, DataType);
     //
-    PartialQuadratureFunctionView(PartialQuadratureFunctionView&&) noexcept = default;
+    PartialQuadratureFunctionView(PartialQuadratureFunctionView&&) noexcept =
+        default;
     PartialQuadratureFunctionView(
         const PartialQuadratureFunctionView&) noexcept = default;
     /*!
@@ -97,8 +77,8 @@ namespace mgis::arcane {
      */
     [[nodiscard]] const PartialQuadratureSpace& getSpace() const noexcept;
     //
-    [[nodiscard]] Arcane::ArrayView<real> operator()(const Arcane::Integer) noexcept
-        requires(is_mutable);
+    [[nodiscard]] Arcane::ArrayView<real> operator()(
+        const Arcane::Integer) noexcept requires(is_mutable);
     [[nodiscard]] Arcane::ConstArrayView<real> operator()(
         const Arcane::Integer) const noexcept;
     //
@@ -126,7 +106,7 @@ namespace mgis::arcane {
     DataType values;
   };  // end of struct PartialQuadratureFunctionView
 
-    //
+  //
   template <bool is_mutable>
   [[nodiscard]] constexpr bool check(
       mgis::AbstractErrorHandler&,
@@ -139,19 +119,6 @@ namespace mgis::arcane {
   template <bool is_mutable>
   [[nodiscard]] mgis::size_type getNumberOfComponents(
       const PartialQuadratureFunctionView<is_mutable>&) noexcept;
-
-} // end of namespace mgis::arcane
-
-namespace mgis::function{
-
-  template <bool is_mutable>
-  struct LightweightViewTraits<
-      mgis::arcane::PartialQuadratureFunctionView<is_mutable>>
-      : std::true_type {};
-
-} // end of namespace mgis::function
-
-namespace mgis::arcane{
 
   struct PartialQuadratureFunction : PartialQuadratureFunctionBase,
                                      PartialQuadratureFunctionView<true> {
@@ -174,7 +141,44 @@ namespace mgis::arcane{
   [[nodiscard]] PartialQuadratureFunctionView<false> view(
       const PartialQuadratureFunction&) noexcept;
 
-} // end of namespace mgis::arcane
+}  // end of namespace mgis::arcane
+
+namespace mgis::function {
+
+  template <bool is_mutable>
+  struct LightweightViewTraits<
+      mgis::arcane::PartialQuadratureFunctionView<is_mutable>>
+      : std::true_type {};
+
+  namespace internals {
+
+    template <>
+    struct FunctionResultTypeTraits<Arcane::ArrayView<real>> {
+      static constexpr auto is_specialized = true;
+    };
+
+    template <>
+    struct FunctionResultTypeTraits<Arcane::ConstArrayView<real>> {
+      static constexpr auto is_specialized = true;
+    };
+
+  }  // end of namespace internals
+
+}  // end of namespace mgis::function
+
+namespace mgis::arcane {
+
+  template <Arcane::Integer N, bool is_mutable>
+  [[nodiscard]] auto view(
+      PartialQuadratureFunctionView<is_mutable>&) noexcept  //
+      requires(N > 0);
+
+  template <Arcane::Integer N, bool is_mutable>
+  [[nodiscard]] auto view(
+      const PartialQuadratureFunctionView<is_mutable>&) noexcept
+      requires(N > 0);
+
+}  // end of namespace mgis::arcane
 
 #include "MGIS/Arcane/PartialQuadratureFunction.ixx"
 

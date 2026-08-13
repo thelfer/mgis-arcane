@@ -25,10 +25,9 @@ namespace mgis::arcane {
       "PartialQuadratureSpace does not statisfy the "
       "LinearQuadratureSpaceConcept");
 
-  PartialQuadratureSpace::PartialQuadratureSpace(
-      Arcane::ITraceMng &tm,
-      const Arcane::CellGroup &c,
-      const Arcane::String &name)
+  PartialQuadratureSpace::PartialQuadratureSpace(Arcane::ITraceMng &tm,
+                                                 const Arcane::CellGroup &c,
+                                                 const Arcane::String &name)
       : TraceAccessor(&tm), cells(c) {
     using namespace Arcane;
     IMesh *mesh = this->cells.mesh();
@@ -44,8 +43,8 @@ namespace mgis::arcane {
     // are always the same.
     Int32 max_nb_dof_per_cell =
         cell_family->globalConnectivityInfos()->maxNodePerItem();
-    info() << "Create DoF family '" << name
-           << "' for cells of group '" << this->cells.name() << "'";
+    info() << "Create DoF family '" << name << "' for cells of group '"
+           << this->cells.name() << "'";
     info() << "MAX_NB_DOF_PER_CELL=" << max_nb_dof_per_cell;
 
     // Create the DoFs
@@ -91,7 +90,8 @@ namespace mgis::arcane {
     }
     info() << "End build Dofs";
 
-    IndexedCellDoFConnectivityView cell_dof(this->cell_dof_connectivity->view());
+    IndexedCellDoFConnectivityView cell_dof(
+        this->cell_dof_connectivity->view());
     {
       // Set the owners of the DoF.
       // It is only used when using message passing (i.e MPI)

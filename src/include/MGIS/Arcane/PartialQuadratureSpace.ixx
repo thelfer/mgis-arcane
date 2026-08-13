@@ -17,14 +17,15 @@ namespace mgis::arcane {
     return this->cells_view;
   }  // end of getCellGroupItems
 
-  inline const Arcane::ItemVectorView&
+  inline const Arcane::ItemVectorView &
   PartialQuadratureSpaceView::getDoFFamilyItems() const {
     return this->dof_family_view;
-  } // end of getDoFFamilyItems
+  }  // end of getDoFFamilyItems
 
   inline Arcane::IndexedCellDoFConnectivityView
   PartialQuadratureSpaceView::getCellDoFConnectivity() const {
-    return this->cell_dof_connectivity_view;;
+    return this->cell_dof_connectivity_view;
+    ;
   }  // end of getCellDoFConnectivity
 
   inline const Arcane::IItemFamily &PartialQuadratureSpace::getDoFFamily()
@@ -32,7 +33,8 @@ namespace mgis::arcane {
     return *(this->dof_family);
   }  // end of getDoFFamily
 
-  inline Arcane::IItemFamily &PartialQuadratureSpace::getMutableDoFFamilyReference(){
+  inline Arcane::IItemFamily &
+  PartialQuadratureSpace::getMutableDoFFamilyReference() {
     return *(this->dof_family);
   }  // end of getMutableDoFFamilyReference
 
@@ -63,7 +65,7 @@ namespace mgis::arcane {
       const Arcane::Integer q) noexcept {
     const auto id =
         Arcane::ItemLocalIdT<Arcane::Cell>(s.getCellGroupItems()[e].localId());
-    const auto& c = s.getCellDoFConnectivity();
+    const auto &c = s.getCellDoFConnectivity();
     return c.items(id)[q];
   }  // end of getQuadraturePointOffset
 

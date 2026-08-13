@@ -1,6 +1,6 @@
 /*!
  * \file   MGIS/Arcane/PartialQuadratureFunction.ixx
- * \brief    
+ * \brief
  * \author Thomas Helfer
  * \date   08/08/2026
  */
@@ -28,7 +28,8 @@ namespace mgis::arcane {
   }
 
   template <bool is_mutable>
-  PartialQuadratureFunctionView<is_mutable>::operator const DataType&() const noexcept {
+  PartialQuadratureFunctionView<is_mutable>::operator const DataType&()
+      const noexcept {
     return this->values;
   }
 
@@ -69,7 +70,7 @@ namespace mgis::arcane {
   template <bool is_mutable>
   const real* PartialQuadratureFunctionView<is_mutable>::data() const noexcept {
     return this->values.data();
-  } // end of data
+  }  // end of data
 
   inline auto PartialQuadratureFunction::view() noexcept {
     return static_cast<PartialQuadratureFunctionView<true>&>(*this);
@@ -111,6 +112,18 @@ namespace mgis::arcane {
     return f.view();
   }  // end of view
 
-} // end of namespace mgis::arcane
+  template <Arcane::Integer N, bool is_mutable>
+  auto view(PartialQuadratureFunctionView<is_mutable>& f) noexcept
+      requires(N > 0) {
+    return ::mgis::function::view<static_cast<::mgis::size_type>(N)>(f);
+  }
+
+  template <Arcane::Integer N, bool is_mutable>
+  auto view(const PartialQuadratureFunctionView<is_mutable>& f) noexcept
+      requires(N > 0) {
+    return ::mgis::function::view<static_cast<::mgis::size_type>(N)>(f);
+  }
+
+}  // end of namespace mgis::arcane
 
 #endif /* LIB_MGIS_ARCANE_PARTIALQUADRATUREFUNCTION_HXX */

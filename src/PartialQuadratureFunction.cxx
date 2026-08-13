@@ -1,13 +1,12 @@
 /*!
  * \file   src/PartialQuadratureFunction.cxx
- * \brief    
+ * \brief
  * \author Thomas Helfer
  * \date   08/08/2026
  */
 
 #include "MGIS/Function/Algorithms.hxx"
 #include "MGIS/Function/EvaluatorConcept.hxx"
-#include "MGIS/Function/FixedSizeModifier.hxx"
 #include "MGIS/Arcane/PartialQuadratureFunction.hxx"
 
 namespace mgis::arcane {
@@ -43,13 +42,4 @@ namespace mgis::arcane {
                                       this->variable.asArray()) {
   }  // end of PartialQuadratureFunction
 
-  void test(mgis::Context& ctx,
-            PartialQuadratureFunction& f,
-            PartialQuadratureFunction& f2) {
-    using namespace mgis::function;
-    // //    auto v = ::mgis::function::view<1>(f);
-    auto v2 = ::mgis::function::view<1>(view(f));
-    assign(ctx, f, v2 | multiply_by_scalar(3));
-  }
-
-} // end of namespace mgis::arcane
+}  // end of namespace mgis::arcane
