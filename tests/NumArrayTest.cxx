@@ -117,7 +117,7 @@ void f6() {
   using namespace mgis;
   using namespace mgis::function;
   auto ctx = Context{};
-  auto initializer = Arcane::Accelerator::AcceleratorInitializer{false, 64};
+  auto initializer = Arcane::Accelerator::AcceleratorInitializer{true, 64};
   auto runner = Arcane::Runner{initializer.executionPolicy()};
   auto queue = Arcane::Accelerator::makeQueue(runner);
   auto a = Arcane::NumArray<real, Arcane::MDDim1>(
