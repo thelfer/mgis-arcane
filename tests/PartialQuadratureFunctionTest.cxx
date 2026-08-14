@@ -26,6 +26,7 @@
 #include "TFEL/Tests/TestCase.hxx"
 #include "TFEL/Tests/TestProxy.hxx"
 #include "TFEL/Tests/TestManager.hxx"
+#include "MGIS/Function/TFEL/Tensors.hxx"
 #include "MGIS/Arcane/PartialQuadratureFunction.hxx"
 
 struct PartialQuadratureFunctionTest final : public tfel::tests::TestCase {
@@ -35,6 +36,7 @@ struct PartialQuadratureFunctionTest final : public tfel::tests::TestCase {
   tfel::tests::TestResult execute() override {
     this->initialize();
     this->test1();
+    this->test2();
     return this->result;
   }  // end of execute
  private:
@@ -72,6 +74,8 @@ struct PartialQuadratureFunctionTest final : public tfel::tests::TestCase {
     this->mat2 = cell_family->createGroup("Mat2", mat2_cells_id);
   }  // end of initialize
 
+  // manipulation of scalar fields
+  // using standard MGIS/Function's algorithms (CPU version only)
   void test1() {
     using namespace mgis::function;
     using namespace mgis::arcane;
@@ -109,6 +113,42 @@ struct PartialQuadratureFunctionTest final : public tfel::tests::TestCase {
     }
     TFEL_TESTS_ASSERT(eps < Arcane::Real{1e-14});
   }
+  //
+  void test2() {
+    using namespace mgis::function;
+    using namespace mgis::arcane;
+    auto ctx = ::mgis::Context{};
+    // Get the trace class to display messages
+    auto &tm = *(this->launcher.traceMng());
+    // creating the partial quadrature space
+    auto space = std::make_shared<PartialQuadratureSpace>(
+        tm, this->mat1, "Mat1StandardQuadrature");
+    auto f = PartialQuadratureFunction(space, "f", 6);
+    // creating mutable tensor view
+    auto v = f | as_stensor<3>;
+    TFEL_TESTS_ASSERT(v.check(ctx));
+    for (Arcane::Integer i = 0; i != getSpaceSize(v.getSpace()); ++i) {
+      v(i) = tfel::math::stensor<3>::Id();
+    }
+    //
+    const auto &vdof = static_cast<const Arcane::VariableDoFArrayReal &>(f);
+    auto eps = Arcane::Real{};
+    ENUMERATE_(Arcane::DoF, idof, space->getDoFFamily().allItems()) {
+      const auto dof = *idof;
+      const auto dof_value = vdof[dof];
+      auto leps = Arcane::Real{};
+      for (Arcane::Integer i = 0; i != 6; ++i) {
+        if (i < 3) {
+          leps += std::abs(dof_value[i] - 1);
+        } else {
+          leps += std::abs(dof_value[i]);
+        }
+      }
+      eps = std::max(leps, eps);
+    }
+    TFEL_TESTS_ASSERT(eps < Arcane::Real{1e-14});
+  }  // end of test2
+
   //
   Arcane::StandaloneSubDomain launcher;
   Arcane::CellGroup mat1;

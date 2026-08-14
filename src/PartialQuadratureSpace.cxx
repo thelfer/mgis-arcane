@@ -32,11 +32,10 @@ namespace mgis::arcane {
     using namespace Arcane;
     IMesh *mesh = this->cells.mesh();
     IItemFamily *cell_family = this->cells.itemFamily();
-    IItemFamily *dof_family_interface =
+    this->dof_family_interface =
         mesh->findItemFamily(Arcane::IK_DoF, name, true);
-    IDoFFamily *dof_family =
-        ARCANE_CHECK_POINTER(dof_family_interface->toDoFFamily());
-    this->dof_family = dof_family_interface;
+    this->dof_family =
+        ARCANE_CHECK_POINTER(this->dof_family_interface->toDoFFamily());
 
     // Get the maximum number of nodes of cells across all sub-domains.
     // This will be used to compute the uniqueId of the DoF and make sure they
@@ -75,7 +74,7 @@ namespace mgis::arcane {
     // Create Cell -> DoF connectivity.
     this->cell_dof_connectivity =
         mesh->indexedConnectivityMng()->findOrCreateConnectivity(
-            mesh->cellFamily(), this->dof_family, name + "DoFCell");
+            mesh->cellFamily(), this->dof_family_interface, name + "DoFCell");
     auto *cn = this->cell_dof_connectivity->connectivity();
     {
       Integer dof_index = 0;
@@ -97,7 +96,7 @@ namespace mgis::arcane {
       // It is only used when using message passing (i.e MPI)
       IParallelMng *pm = mesh->parallelMng();
       Int32 my_rank = pm->commRank();
-      DoFInfoListView dofs_view(this->dof_family);
+      DoFInfoListView dofs_view(this->dof_family_interface);
       ENUMERATE_(Cell, icell, mesh->allCells()) {
         Cell cell = *icell;
         Int32 cell_owner = cell.owner();
@@ -105,12 +104,12 @@ namespace mgis::arcane {
           dofs_view[dof].mutableItemBase().setOwner(cell_owner, my_rank);
         }
       }
-      this->dof_family->notifyItemsOwnerChanged();
-      this->dof_family->computeSynchronizeInfos();
+      this->dof_family_interface->notifyItemsOwnerChanged();
+      this->dof_family_interface->computeSynchronizeInfos();
     }
     // creating views
     this->cells_view = this->cells.view();
-    this->dof_family_view = this->dof_family->view();
+    this->dof_family_view = this->dof_family_interface->view();
     this->cell_dof_connectivity_view = this->cell_dof_connectivity->view();
   }  // end of PartialQuadratureSpace
 

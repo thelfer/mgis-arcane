@@ -28,12 +28,22 @@ namespace mgis::arcane {
     ;
   }  // end of getCellDoFConnectivity
 
-  inline const Arcane::IItemFamily &PartialQuadratureSpace::getDoFFamily()
+  inline const Arcane::IItemFamily &
+  PartialQuadratureSpace::getDoFFamilyInterface() const {
+    return *(this->dof_family_interface);
+  }  // end of getDoFFamilyInterface
+
+  inline Arcane::IItemFamily &
+  PartialQuadratureSpace::getMutableDoFFamilyInterfaceReference() {
+    return *(this->dof_family_interface);
+  }  // end of getMutableDoFFamilyInterfaceReference
+
+  inline const Arcane::IDoFFamily &PartialQuadratureSpace::getDoFFamily()
       const {
     return *(this->dof_family);
   }  // end of getDoFFamily
 
-  inline Arcane::IItemFamily &
+  inline Arcane::IDoFFamily &
   PartialQuadratureSpace::getMutableDoFFamilyReference() {
     return *(this->dof_family);
   }  // end of getMutableDoFFamilyReference

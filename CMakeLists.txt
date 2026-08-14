@@ -12,6 +12,18 @@ include(CMakePackageConfigHelpers)
 
 find_package(Arcane REQUIRED)
 find_package(MFrontGenericInterface REQUIRED)
+
+if(NOT MGIS_FUNCTION_SUPPORT)
+  message(FATAL_ERROR "support for MGIS/Function has not been enabled in MGIS")
+endif(NOT MGIS_FUNCTION_SUPPORT)
+
+if(NOT MGIS_HAVE_TFEL)
+  message(FATAL_ERROR "TFEL support has not been enabled in MGIS")
+endif(NOT MGIS_HAVE_TFEL)
+
+set(MGIS_HAVE_TFEL @MGIS_HAVE_TFEL@)
+
+
 find_package(TFELTests)
 
 arccore_accelerator_enable()

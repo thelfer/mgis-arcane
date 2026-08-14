@@ -28,8 +28,8 @@ namespace mgis::arcane {
       const Arcane::String& n,
       const Arcane::Integer c)
       : qspace(s),
-        variable(Arcane::VariableBuildInfo(&(s->getMutableDoFFamilyReference()),
-                                           n)) {
+        variable(Arcane::VariableBuildInfo(
+            &(s->getMutableDoFFamilyInterfaceReference()), n)) {
     this->variable.resize(c);
   }  // end ofPartialQuadratureFunctionBase
 

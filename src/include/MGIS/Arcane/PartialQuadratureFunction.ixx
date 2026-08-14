@@ -15,6 +15,16 @@ namespace mgis::arcane {
     return *(this->qspace);
   }  // end of getSpace
 
+  inline PartialQuadratureFunctionBase::operator Arcane::
+      VariableDoFArrayReal&() noexcept {
+    return this->variable;
+  }
+
+  inline PartialQuadratureFunctionBase::operator const Arcane::
+      VariableDoFArrayReal&() const noexcept {
+    return this->variable;
+  }
+
   template <bool is_mutable>
   PartialQuadratureFunctionView<is_mutable>::PartialQuadratureFunctionView(
       const PartialQuadratureSpace& s, DataType d)
@@ -43,7 +53,8 @@ namespace mgis::arcane {
   real* PartialQuadratureFunctionView<is_mutable>::data(
       ::mgis::attributes::UnsafeAttribute,
       const Arcane::Integer e) requires(is_mutable) {
-    return this->values.unguardedBasePointer() + e;
+    const auto s = this->values.dim2Size();
+    return this->values.unguardedBasePointer() + (e * s);
   }  // end of data
 
   template <bool is_mutable>
@@ -58,7 +69,8 @@ namespace mgis::arcane {
   template <bool is_mutable>
   const real* PartialQuadratureFunctionView<is_mutable>::data(
       ::mgis::attributes::UnsafeAttribute, const Arcane::Integer e) const {
-    return Arcane::ConstArray2View<real>(this->values).data() + e;
+    const auto s = this->values.dim2Size();
+    return Arcane::ConstArray2View<real>(this->values).data() + (e * s);
   }  // end of data
 
   template <bool is_mutable>

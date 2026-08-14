@@ -43,15 +43,18 @@ namespace mgis::arcane {
     //
     [[nodiscard]] const Arcane::CellGroup &getCellGroup() const noexcept;
     //
-    [[nodiscard]] const Arcane::IItemFamily &getDoFFamily() const;
+    [[nodiscard]] const Arcane::IItemFamily &getDoFFamilyInterface() const;
+    [[nodiscard]] const Arcane::IDoFFamily &getDoFFamily() const;
     //
-    [[nodiscard]] Arcane::IItemFamily &getMutableDoFFamilyReference();
+    [[nodiscard]] Arcane::IItemFamily &getMutableDoFFamilyInterfaceReference();
+    [[nodiscard]] Arcane::IDoFFamily &getMutableDoFFamilyReference();
 
    private:
     const Arcane::CellGroup &cells;
     Arcane::Ref<Arcane::IIndexedIncrementalItemConnectivity>
         cell_dof_connectivity;
-    Arcane::IItemFamily *dof_family = nullptr;
+    Arcane::IItemFamily *dof_family_interface = nullptr;
+    Arcane::IDoFFamily *dof_family = nullptr;
   };
 
   [[nodiscard]] Arcane::Integer getSpaceSize(
