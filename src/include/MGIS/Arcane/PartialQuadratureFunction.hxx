@@ -185,11 +185,6 @@ namespace mgis::function {
       static constexpr auto is_specialized = true;
     };
 
-    template <>
-    struct FunctionResultTypeTraits<Arcane::ConstArrayView<real>> {
-      static constexpr auto is_specialized = true;
-    };
-
   }  // end of namespace internals
 
 }  // end of namespace mgis::function

@@ -95,10 +95,9 @@ struct PartialQuadratureFunctionTest final : public tfel::tests::TestCase {
       f2(i)[0] = 2;
     }
     // creating mutable scalar view
-    auto v = ::mgis::arcane::view<1>(f);
+    auto v = f | as_scalar;
     // creating immutable scalar view matching MGIS/Function EvaluatorConcept
-    auto v2 = ::mgis::arcane::view<1>(
-        static_cast<const PartialQuadratureFunction &>(f2));
+    auto v2 = static_cast<const PartialQuadratureFunction &>(f2) | as_scalar;
     TFEL_TESTS_ASSERT(getNumberOfComponents(v) == 1);
     TFEL_TESTS_ASSERT(getNumberOfComponents(v2) == 1);
     //
