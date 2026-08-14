@@ -19,6 +19,7 @@ if(TFELTests_FOUND)
   add_executable(PartialQuadratureFunctionTest
     EXCLUDE_FROM_ALL
     PartialQuadratureFunctionTest.cxx)
+  add_dependencies(build-tests PartialQuadratureFunctionTest)
   arccore_accelerator_add_source_files(PartialQuadratureFunctionTest.cxx)
   arccore_accelerator_add_to_target(PartialQuadratureFunctionTest)
   target_link_libraries(PartialQuadratureFunctionTest PRIVATE mgis-arcane::MGISArcane tfel::TFELTests)
