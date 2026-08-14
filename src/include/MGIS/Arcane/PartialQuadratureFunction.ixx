@@ -40,6 +40,37 @@ namespace mgis::arcane {
   }  // end of getSpace
 
   template <bool is_mutable>
+  real* PartialQuadratureFunctionView<is_mutable>::data(
+      ::mgis::attributes::UnsafeAttribute,
+      const Arcane::Integer e) requires(is_mutable) {
+    return this->values.unguardedBasePointer() + e;
+  }  // end of data
+
+  template <bool is_mutable>
+  real* PartialQuadratureFunctionView<is_mutable>::data(
+      ::mgis::attributes::UnsafeAttribute,
+      const Arcane::Integer c,
+      const Arcane::Integer q) requires(is_mutable) {
+    const auto o = getQuadraturePointOffset(this->qspace_view, c, q);
+    return this->data(::mgis::unsafe, o);
+  }  // end of data
+
+  template <bool is_mutable>
+  const real* PartialQuadratureFunctionView<is_mutable>::data(
+      ::mgis::attributes::UnsafeAttribute, const Arcane::Integer e) const {
+    return Arcane::ConstArray2View<real>(this->values).data() + e;
+  }  // end of data
+
+  template <bool is_mutable>
+  const real* PartialQuadratureFunctionView<is_mutable>::data(
+      ::mgis::attributes::UnsafeAttribute,
+      const Arcane::Integer c,
+      const Arcane::Integer q) const {
+    const auto o = getQuadraturePointOffset(this->qspace_view, c, q);
+    return this->data(::mgis::unsafe, o);
+  }  // end of data
+
+  template <bool is_mutable>
   Arcane::ArrayView<real> PartialQuadratureFunctionView<is_mutable>::operator()(
       const Arcane::Integer e) noexcept requires(is_mutable) {
     return this->values[e];

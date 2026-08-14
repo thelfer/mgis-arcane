@@ -89,6 +89,34 @@ namespace mgis::arcane {
         const Arcane::Integer, const Arcane::Integer) const noexcept;
     //! \brief return a pointer to the underlying data
     [[nodiscard]] const real* data() const noexcept;
+    /*!
+     * \return the data associated with an integration point
+     * \param[in] o: offset associated with the integration point
+     */
+    [[nodiscard]] real* data(::mgis::attributes::UnsafeAttribute,
+                             const Arcane::Integer) requires(is_mutable);
+    /*!
+     * \return the data associated with an integration point
+     * \param[in] e: element index
+     * \param[in] i: quadrature point index
+     */
+    [[nodiscard]] real* data(mgis::attributes::UnsafeAttribute,
+                             const Arcane::Integer,
+                             const Arcane::Integer) requires(is_mutable);
+    /*!
+     * \return the data associated with an integration point
+     * \param[in] o: offset associated with the integration point
+     */
+    [[nodiscard]] const real* data(mgis::attributes::UnsafeAttribute,
+                                   const Arcane::Integer) const;
+    /*!
+     * \return the data associated with an integration point
+     * \param[in] e: element index
+     * \param[in] i: quadrature point index
+     */
+    [[nodiscard]] const real* data(mgis::attributes::UnsafeAttribute,
+                                   const Arcane::Integer,
+                                   const Arcane::Integer) const;
     //
     [[nodiscard]] explicit operator DataType&() noexcept;
     [[nodiscard]] explicit operator const DataType&() const noexcept;
