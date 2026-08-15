@@ -57,25 +57,54 @@ namespace mgis::arcane {
     Arcane::VariableDoFArrayReal variable;
   };  // end of struct PartialQuadratureFunctionBase
 
-  template <bool is_mutable = true>
-  struct PartialQuadratureFunctionView {
+  template <bool is_mutable>
+  struct PartialQuadratureFunctionViewBase {
     //
     using DataType = std::conditional_t<is_mutable,
                                         Arcane::Array2View<real>,
                                         Arcane::ConstArray2View<real>>;
     //
-    PartialQuadratureFunctionView(const PartialQuadratureSpace&, DataType);
+    PartialQuadratureFunctionViewBase(const PartialQuadratureSpace&, DataType);
     //
-    PartialQuadratureFunctionView(PartialQuadratureFunctionView&&) noexcept =
-        default;
-    PartialQuadratureFunctionView(
-        const PartialQuadratureFunctionView&) noexcept = default;
+    PartialQuadratureFunctionViewBase(
+        PartialQuadratureFunctionViewBase&&) noexcept = default;
+    PartialQuadratureFunctionViewBase(
+        const PartialQuadratureFunctionViewBase&) noexcept = default;
     /*!
      * \return the underlying space
      *
      * \note this method shall not be used on the device
      */
     [[nodiscard]] const PartialQuadratureSpace& getSpace() const noexcept;
+    //
+    [[nodiscard]] explicit operator DataType&() noexcept;
+    [[nodiscard]] explicit operator const DataType&() const noexcept;
+
+   protected:
+    /*!
+     * \brief pointer to the quadrature space
+     *
+     * \note this pointer shall not be used on the device
+     */
+    const PartialQuadratureSpace* const qspace_ptr;
+    //! \brief view to partial quadrature space
+    const PartialQuadratureSpaceView qspace_view;
+    //! \brief view to the data of the partial quadrature function data
+    DataType values;
+  };  // end of struct PartialQuadratureFunctionView
+
+  template <bool is_mutable = true>
+  struct PartialQuadratureFunctionView
+      : PartialQuadratureFunctionViewBase<is_mutable> {
+    //
+    using PartialQuadratureFunctionViewBase<
+        is_mutable>::PartialQuadratureFunctionViewBase;
+    //
+    PartialQuadratureFunctionView(PartialQuadratureFunctionView&&) noexcept =
+        default;
+    PartialQuadratureFunctionView(
+        const PartialQuadratureFunctionView&) noexcept = default;
+
     //
     [[nodiscard]] Arcane::ArrayView<real> operator()(
         const Arcane::Integer) noexcept requires(is_mutable);
@@ -117,28 +146,105 @@ namespace mgis::arcane {
     [[nodiscard]] const real* data(mgis::attributes::UnsafeAttribute,
                                    const Arcane::Integer,
                                    const Arcane::Integer) const;
+  };
+
+  /*!
+   * \brief base class for the SubPartialQuadratureFunctionView
+   *
+   * \note This class has been introduced for the check method to be
+   * implented in a source file (error handling and check functions
+   * shall are better not be inlined). This class is not meant to be used by an
+   * end-user. It's constructor is declared protected on purpose.
+   */
+  struct SubPartialQuadratureFunctionViewBase {
     //
-    [[nodiscard]] explicit operator DataType&() noexcept;
-    [[nodiscard]] explicit operator const DataType&() const noexcept;
+    struct Description {
+      const Arcane::Integer begin;
+      const Arcane::Integer size;
+    };
 
    protected:
+    SubPartialQuadratureFunctionViewBase(const Description);
+    //
+    [[nodiscard]] bool check(mgis::AbstractErrorHandler&,
+                             const Arcane::Integer) const noexcept;
+
+   private:
+    Arcane::Integer data_begin;
+    Arcane::Integer data_size;
+  };
+
+  template <bool is_mutable = true>
+  struct SubPartialQuadratureFunctionView
+      : SubPartialQuadratureFunctionViewBase,
+        PartialQuadratureFunctionViewBase<is_mutable> {
+    //
+    using DataType =
+        typename PartialQuadratureFunctionViewBase<is_mutable>::DataType;
+    //
+    SubPartialQuadratureFunctionView(const PartialQuadratureSpace&,
+                                     DataType,
+                                     const Description);
+    //
+    SubPartialQuadratureFunctionView(
+        SubPartialQuadratureFunctionView&&) noexcept = default;
+    SubPartialQuadratureFunctionView(
+        const SubPartialQuadratureFunctionView&) noexcept = default;
+    //
+    [[nodiscard]] bool check(mgis::AbstractErrorHandler&) const noexcept;
+    //
+    [[nodiscard]] Arcane::ArrayView<real> operator()(
+        const Arcane::Integer) noexcept requires(is_mutable);
+    [[nodiscard]] Arcane::ConstArrayView<real> operator()(
+        const Arcane::Integer) const noexcept;
+    //
+    [[nodiscard]] Arcane::ArrayView<real> operator()(
+        const Arcane::Integer, const Arcane::Integer) noexcept
+        requires(is_mutable);
+    [[nodiscard]] Arcane::ConstArrayView<real> operator()(
+        const Arcane::Integer, const Arcane::Integer) const noexcept;
+    //! \brief return a pointer to the underlying data
+    [[nodiscard]] const real* data() const noexcept;
     /*!
-     * \brief pointer to the quadrature space
-     *
-     * \note this pointer shall not be used on the device
+     * \return the data associated with an integration point
+     * \param[in] o: offset associated with the integration point
      */
-    const PartialQuadratureSpace* const qspace_ptr;
-    //! \brief view to partial quadrature space
-    const PartialQuadratureSpaceView qspace_view;
-    //! \brief view to the data of the partial quadrature function data
-    DataType values;
-  };  // end of struct PartialQuadratureFunctionView
+    [[nodiscard]] real* data(::mgis::attributes::UnsafeAttribute,
+                             const Arcane::Integer) requires(is_mutable);
+    /*!
+     * \return the data associated with an integration point
+     * \param[in] e: element index
+     * \param[in] i: quadrature point index
+     */
+    [[nodiscard]] real* data(mgis::attributes::UnsafeAttribute,
+                             const Arcane::Integer,
+                             const Arcane::Integer) requires(is_mutable);
+    /*!
+     * \return the data associated with an integration point
+     * \param[in] o: offset associated with the integration point
+     */
+    [[nodiscard]] const real* data(mgis::attributes::UnsafeAttribute,
+                                   const Arcane::Integer) const;
+    /*!
+     * \return the data associated with an integration point
+     * \param[in] e: element index
+     * \param[in] i: quadrature point index
+     */
+    [[nodiscard]] const real* data(mgis::attributes::UnsafeAttribute,
+                                   const Arcane::Integer,
+                                   const Arcane::Integer) const;
+  };
 
   //
   template <bool is_mutable>
   [[nodiscard]] constexpr bool check(
       mgis::AbstractErrorHandler&,
       const PartialQuadratureFunctionView<is_mutable>&) noexcept;
+
+  template <bool is_mutable>
+  [[nodiscard]] bool check(
+      mgis::AbstractErrorHandler&,
+      const SubPartialQuadratureFunctionView<is_mutable>&) noexcept;
 
   template <bool is_mutable>
   [[nodiscard]] const PartialQuadratureSpace& getSpace(
@@ -188,20 +294,6 @@ namespace mgis::function {
   }  // end of namespace internals
 
 }  // end of namespace mgis::function
-
-namespace mgis::arcane {
-
-  template <Arcane::Integer N, bool is_mutable>
-  [[nodiscard]] auto view(
-      PartialQuadratureFunctionView<is_mutable>&) noexcept  //
-      requires(N > 0);
-
-  template <Arcane::Integer N, bool is_mutable>
-  [[nodiscard]] auto view(
-      const PartialQuadratureFunctionView<is_mutable>&) noexcept
-      requires(N > 0);
-
-}  // end of namespace mgis::arcane
 
 #include "MGIS/Arcane/PartialQuadratureFunction.ixx"
 
