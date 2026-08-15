@@ -54,80 +54,17 @@ namespace mgis::arcane {
     return *(this->qspace_ptr);
   }  // end of getSpace
 
-  //  Implementation of PartialQuadratureFunctionView's methods
-
-  template <bool is_mutable>
-  real* PartialQuadratureFunctionView<is_mutable>::data(
-      ::mgis::attributes::UnsafeAttribute,
-      const Arcane::Integer e) requires(is_mutable) {
-    const auto s = this->values.dim2Size();
-    return this->values.unguardedBasePointer() + (e * s);
-  }  // end of data
-
-  template <bool is_mutable>
-  real* PartialQuadratureFunctionView<is_mutable>::data(
-      ::mgis::attributes::UnsafeAttribute,
-      const Arcane::Integer c,
-      const Arcane::Integer q) requires(is_mutable) {
-    const auto o = getQuadraturePointOffset(this->qspace_view, c, q);
-    return this->data(::mgis::unsafe, o);
-  }  // end of data
-
-  template <bool is_mutable>
-  const real* PartialQuadratureFunctionView<is_mutable>::data(
-      ::mgis::attributes::UnsafeAttribute, const Arcane::Integer e) const {
-    const auto s = this->values.dim2Size();
-    return Arcane::ConstArray2View<real>(this->values).data() + (e * s);
-  }  // end of data
-
-  template <bool is_mutable>
-  const real* PartialQuadratureFunctionView<is_mutable>::data(
-      ::mgis::attributes::UnsafeAttribute,
-      const Arcane::Integer c,
-      const Arcane::Integer q) const {
-    const auto o = getQuadraturePointOffset(this->qspace_view, c, q);
-    return this->data(::mgis::unsafe, o);
-  }  // end of data
-
-  template <bool is_mutable>
-  Arcane::ArrayView<real> PartialQuadratureFunctionView<is_mutable>::operator()(
-      const Arcane::Integer e) noexcept requires(is_mutable) {
-    return this->values[e];
-  }  // end of operator()
-
-  template <bool is_mutable>
-  Arcane::ConstArrayView<real>
-  PartialQuadratureFunctionView<is_mutable>::operator()(
-      const Arcane::Integer e) const noexcept {
-    return this->values[e];
-  }  // end of operator()
-
-  //
-  template <bool is_mutable>
-  Arcane::ArrayView<real> PartialQuadratureFunctionView<is_mutable>::operator()(
-      const Arcane::Integer c, const Arcane::Integer q) noexcept
-      requires(is_mutable) {
-    return this->operator()(getQuadraturePointOffset(this->qspace_view, c, q));
-  }  // end of operator()
-
-  template <bool is_mutable>
-  Arcane::ConstArrayView<real>
-  PartialQuadratureFunctionView<is_mutable>::operator()(
-      const Arcane::Integer c, const Arcane::Integer q) const noexcept {
-    return this->operator()(getQuadraturePointOffset(this->qspace_view, c, q));
-  }  // end of operator()
-
-  template <bool is_mutable>
-  const real* PartialQuadratureFunctionView<is_mutable>::data() const noexcept {
-    return this->values.data();
-  }  // end of data
-
   //  Implementation of SubPartialQuadratureFunctionViewBase's methods
 
   SubPartialQuadratureFunctionViewBase::SubPartialQuadratureFunctionViewBase(
       const Description d)
       : data_begin(d.begin),
         data_size(d.size) {}  // end of SubPartialQuadratureFunctionView
+
+  inline Arcane::Integer SubPartialQuadratureFunctionViewBase::getDataSize()
+      const noexcept {
+    return this->data_size;
+  }  // end of getDataSize
 
   //  Implementation of SubPartialQuadratureFunctionView's methods
 
@@ -217,6 +154,93 @@ namespace mgis::arcane {
 
   //  Implementation of PartialQuadratureFunctionView's methods
 
+  template <bool is_mutable>
+  real* PartialQuadratureFunctionView<is_mutable>::data(
+      ::mgis::attributes::UnsafeAttribute,
+      const Arcane::Integer e) requires(is_mutable) {
+    const auto s = this->values.dim2Size();
+    return this->values.unguardedBasePointer() + (e * s);
+  }  // end of data
+
+  template <bool is_mutable>
+  real* PartialQuadratureFunctionView<is_mutable>::data(
+      ::mgis::attributes::UnsafeAttribute,
+      const Arcane::Integer c,
+      const Arcane::Integer q) requires(is_mutable) {
+    const auto o = getQuadraturePointOffset(this->qspace_view, c, q);
+    return this->data(::mgis::unsafe, o);
+  }  // end of data
+
+  template <bool is_mutable>
+  const real* PartialQuadratureFunctionView<is_mutable>::data(
+      ::mgis::attributes::UnsafeAttribute, const Arcane::Integer e) const {
+    const auto s = this->values.dim2Size();
+    return Arcane::ConstArray2View<real>(this->values).data() + (e * s);
+  }  // end of data
+
+  template <bool is_mutable>
+  const real* PartialQuadratureFunctionView<is_mutable>::data(
+      ::mgis::attributes::UnsafeAttribute,
+      const Arcane::Integer c,
+      const Arcane::Integer q) const {
+    const auto o = getQuadraturePointOffset(this->qspace_view, c, q);
+    return this->data(::mgis::unsafe, o);
+  }  // end of data
+
+  template <bool is_mutable>
+  Arcane::ArrayView<real> PartialQuadratureFunctionView<is_mutable>::operator()(
+      const Arcane::Integer e) noexcept requires(is_mutable) {
+    return this->values[e];
+  }  // end of operator()
+
+  template <bool is_mutable>
+  Arcane::ConstArrayView<real>
+  PartialQuadratureFunctionView<is_mutable>::operator()(
+      const Arcane::Integer e) const noexcept {
+    return this->values[e];
+  }  // end of operator()
+
+  //
+  template <bool is_mutable>
+  Arcane::ArrayView<real> PartialQuadratureFunctionView<is_mutable>::operator()(
+      const Arcane::Integer c, const Arcane::Integer q) noexcept
+      requires(is_mutable) {
+    return this->operator()(getQuadraturePointOffset(this->qspace_view, c, q));
+  }  // end of operator()
+
+  template <bool is_mutable>
+  Arcane::ConstArrayView<real>
+  PartialQuadratureFunctionView<is_mutable>::operator()(
+      const Arcane::Integer c, const Arcane::Integer q) const noexcept {
+    return this->operator()(getQuadraturePointOffset(this->qspace_view, c, q));
+  }  // end of operator()
+
+  template <bool is_mutable>
+  const real* PartialQuadratureFunctionView<is_mutable>::data() const noexcept {
+    return this->values.data();
+  }  // end of data
+
+  template <bool is_mutable>
+  SubPartialQuadratureFunctionView<is_mutable>
+  PartialQuadratureFunctionView<is_mutable>::view(
+      typename SubPartialQuadratureFunctionViewBase::Description d) noexcept {
+    return {*(this->qspace_ptr), this->values, d};
+  }  // end of view
+
+  template <bool is_mutable>
+  SubPartialQuadratureFunctionView<false>
+  PartialQuadratureFunctionView<is_mutable>::view(
+      typename SubPartialQuadratureFunctionViewBase::Description d)
+      const noexcept {
+    if constexpr (is_mutable) {
+      return {*(this->qspace_ptr), this->values.constView(), d};
+    } else {
+      return {*(this->qspace_ptr), this->values, d};
+    }
+  }  // end of view
+
+  //  Implementation of PartialQuadratureFunctionView's methods
+
   inline auto PartialQuadratureFunction::view() noexcept {
     return static_cast<PartialQuadratureFunctionView<true>&>(*this);
   }  // end of view
@@ -229,16 +253,28 @@ namespace mgis::arcane {
   // free functions
 
   template <bool is_mutable>
+  bool check(mgis::AbstractErrorHandler& e,
+             const SubPartialQuadratureFunctionView<is_mutable>& f) noexcept {
+    return f.check(e);
+  }  // end of check
+
+  template <bool is_mutable>
+  const PartialQuadratureSpace& getSpace(
+      const SubPartialQuadratureFunctionView<is_mutable>& f) noexcept {
+    return f.getSpace();
+  }  // end of getSpace
+
+  template <bool is_mutable>
+  inline mgis::size_type getNumberOfComponents(
+      const SubPartialQuadratureFunctionView<is_mutable>& f) noexcept {
+    return f.getDataSize();
+  }  // end of getNumberOfComponents
+
+  template <bool is_mutable>
   constexpr bool check(
       mgis::AbstractErrorHandler&,
       const PartialQuadratureFunctionView<is_mutable>&) noexcept {
     return true;
-  }  // end of check
-
-  template <bool is_mutable>
-  bool check(mgis::AbstractErrorHandler& e,
-             const SubPartialQuadratureFunctionView<is_mutable>& f) noexcept {
-    return f.check(e);
   }  // end of check
 
   template <bool is_mutable>

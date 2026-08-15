@@ -12,10 +12,28 @@
 namespace mgis::arcane {
 
   static_assert(
+      mgis::function::EvaluatorConcept<SubPartialQuadratureFunctionView<true>>);
+
+  static_assert(mgis::function::EvaluatorConcept<
+                SubPartialQuadratureFunctionView<false>>);
+
+  static_assert(
       mgis::function::EvaluatorConcept<PartialQuadratureFunctionView<true>>);
 
   static_assert(
       mgis::function::EvaluatorConcept<PartialQuadratureFunctionView<false>>);
+
+  static_assert(mgis::function::ElementFunctionConcept<
+                SubPartialQuadratureFunctionView<true>>);
+
+  static_assert(mgis::function::QuadratureFunctionConcept<
+                SubPartialQuadratureFunctionView<true>>);
+
+  static_assert(mgis::function::ElementFunctionConcept<
+                PartialQuadratureFunctionView<true>>);
+
+  static_assert(mgis::function::QuadratureFunctionConcept<
+                PartialQuadratureFunctionView<true>>);
 
   static_assert(
       mgis::function::ElementFunctionConcept<PartialQuadratureFunction>);
