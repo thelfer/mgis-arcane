@@ -5,6 +5,7 @@
  * \date   13/08/2026
  */
 
+#include <array>
 #include <cstdlib>
 #include "arcane/launcher/ArcaneLauncher.h"
 #include "arcane/core/IDoFFamily.h"
@@ -37,6 +38,7 @@ struct PartialQuadratureFunctionTest final : public tfel::tests::TestCase {
     this->initialize();
     this->test1();
     this->test2();
+    this->test3();
     return this->result;
   }  // end of execute
  private:
@@ -147,7 +149,42 @@ struct PartialQuadratureFunctionTest final : public tfel::tests::TestCase {
     }
     TFEL_TESTS_ASSERT(eps < Arcane::Real{1e-14});
   }  // end of test2
-
+  //
+  void test3() {
+    using namespace mgis::function;
+    using namespace mgis::arcane;
+    auto ctx = ::mgis::Context{};
+    // Get the trace class to display messages
+    auto &tm = *(this->launcher.traceMng());
+    // creating the partial quadrature space
+    auto space = std::make_shared<PartialQuadratureSpace>(
+        tm, this->mat1, "Mat1StandardQuadrature");
+    auto f = PartialQuadratureFunction(space, "f", 7);
+    // creating mutable tensor views for a sub part of the function
+    auto f_part1 = f.view({.begin = 0, .size = 4});
+    auto f_part2 = f.view({.begin = 4, .size = 3});
+    auto v = f_part1 | as_stensor<2>;
+    auto v2 = f_part2 | as_tvector<3>;
+    TFEL_TESTS_ASSERT(v.check(ctx));
+    TFEL_TESTS_ASSERT(v2.check(ctx));
+    for (Arcane::Integer i = 0; i != getSpaceSize(v.getSpace()); ++i) {
+      v(i) = tfel::math::stensor<2>::Id();
+      v2(i) = {-3, -2, -1};
+    }
+    const auto &vdof = static_cast<const Arcane::VariableDoFArrayReal &>(f);
+    auto eps = Arcane::Real{};
+    ENUMERATE_(Arcane::DoF, idof, space->getDoFFamily().allItems()) {
+      const auto ref_values = std::array<mgis::real, 7>{1, 1, 1, 0, -3, -2, -1};
+      const auto dof = *idof;
+      const auto dof_value = vdof[dof];
+      auto leps = Arcane::Real{};
+      for (Arcane::Integer i = 0; i != 7; ++i) {
+        leps += std::abs(dof_value[i] - ref_values[i]);
+      }
+      eps = std::max(leps, eps);
+    }
+    TFEL_TESTS_ASSERT(eps < Arcane::Real{1e-14});
+  }
   //
   Arcane::StandaloneSubDomain launcher;
   Arcane::CellGroup mat1;
